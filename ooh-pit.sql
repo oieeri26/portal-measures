@@ -1,21 +1,21 @@
 /* 
 Out-of-Home - Point in Time Count
 Include:
-	- Race/Eth -- need to add
-	- Gender
-	- Initial Placement
+	-Race/Eth
+	-Gender
+	-Initial Placement
 */
 WITH prm_plcm_setng
 AS (
-	SELECT DISTINCT 0 AS cd_plcm_setng
+	SELECT 0 AS cd_plcm_setng
 		,cd_plcm_setng AS match_code
-	FROM [CA_ODS].[base].[rptPlacement_Events]
+	FROM [CA_ODS].[dbo].[ref_plcm_setting_xwalk]
 	
 	UNION
 	
-	SELECT DISTINCT cd_plcm_setng AS cd_plcm_setng
+	SELECT berk_cd_plcm_setng AS cd_plcm_setng
 		,cd_plcm_setng AS match_code
-	FROM [CA_ODS].[base].[rptPlacement_Events]
+	FROM [CA_ODS].[dbo].[ref_plcm_setting_xwalk]
 	)
 	,prm_gndr
 AS (
@@ -31,7 +31,8 @@ SELECT cd.CALENDAR_DATE AS [date]
 FROM [CA_ODS].[base].[rptPlacement] AS p
 LEFT JOIN [CA_ODS].[dbo].[CALENDAR_DIM] AS cd ON cd.CALENDAR_DATE BETWEEN p.removal_dt
 		AND discharge_dt
-LEFT JOIN [CA_ODS].[base].[rptPlacement_Events] AS ip ON p.id_removal_episode_fact = ip.id_removal_episode_fact AND ip.plcmnt_seq = 1
+LEFT JOIN [CA_ODS].[base].[rptPlacement_Events] AS ip ON p.id_removal_episode_fact = ip.id_removal_episode_fact
+	AND ip.plcmnt_seq = 1
 JOIN prm_gndr AS g ON p.cd_gndr = g.cd_gndr
 JOIN prm_plcm_setng AS ps ON ps.match_code = ip.cd_plcm_setng
 WHERE YEAR(cd.[YEAR]) >= 2000
